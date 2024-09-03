@@ -1,6 +1,7 @@
 package br.tc.tcema.temporealteste;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,16 +19,23 @@ public class CheckProgressFromDemonstrativoController {
 
     private final ProgressoDemonstrativoRepository progressoDemonstrativoRepository;
 
-    @GetMapping("/stream")
-    public SseEmitter streamEvents(@RequestParam Long demonstrativoId) {
-        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+    @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter streamEvents(Long demonstrativoId) {
+        SseEmitter emitter = new SseEmitter(0L);
         ExecutorService sseMvcExecutor = Executors.newSingleThreadExecutor();
         sseMvcExecutor.execute(() -> {
             try {
-                for (int i = 0; true; i++) {
-                    emitter.send(LocalDateTime.now());
+
+                ProgressoDemonstrativoSchema byDemonstrativoId;
+
+                do {
+                    byDemonstrativoId = progressoDemonstrativoRepository.findByDemonstrativoId(demonstrativoId);
+                    emitter.send(String.valueOf(byDemonstrativoId.getProgresso()));
                     Thread.sleep(1000);
-                }
+                } while (byDemonstrativoId.getProgresso() < 100);
+
+                emitter.complete();
+
             } catch (Exception ex) {
                 emitter.completeWithError(ex);
             }

@@ -13,7 +13,7 @@ public class CriaAvaliacaoService {
     private final ProgressoDemonstrativoRepository progressoDemonstrativoRepository;
     private final DemonstrativoRepository demonstrativoRepository;
 
-    public void execute() throws InterruptedException {
+    public void execute(Long demonstrativoId) throws InterruptedException {
         val id = new Random();
 
         val demonstrativo = new DemonstrativoSchema(1L);

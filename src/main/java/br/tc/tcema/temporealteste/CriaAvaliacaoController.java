@@ -13,8 +13,8 @@ public class CriaAvaliacaoController {
     private final CriaAvaliacaoService criaAvaliacaoService;
 
     @PostMapping("/criar")
-    public void criarAvaliacao() throws InterruptedException {
-        criaAvaliacaoService.execute();
+    public void criarAvaliacao(Long demonstrativoId) throws InterruptedException {
+        criaAvaliacaoService.execute(demonstrativoId);
     }
 
 }
